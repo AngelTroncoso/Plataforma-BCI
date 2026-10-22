@@ -1,0 +1,7 @@
+'use client';
+import { useEffect, useRef } from 'react';
+export function WebcamGazeCanvas({ videoRef, points, gaze }: { videoRef: React.RefObject<HTMLVideoElement | null>; points: Array<{x:number;y:number}>; gaze: {x:number;y:number} }) {
+  const canvas = useRef<HTMLCanvasElement>(null);
+  useEffect(() => { const c=canvas.current, v=videoRef.current; if(!c||!v)return; const draw=()=>{const ctx=c.getContext('2d');if(!ctx)return; c.width=v.videoWidth||640;c.height=v.videoHeight||480;ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='rgba(53,216,255,.7)';points.forEach(p=>ctx.fillRect((1-p.x)*c.width-1,p.y*c.height-1,3,3));const x=(1-gaze.x)*c.width,y=gaze.y*c.height;ctx.strokeStyle='#f5d76e';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,24,0,Math.PI*2);ctx.stroke();requestAnimationFrame(draw)}; const id=requestAnimationFrame(draw);return()=>cancelAnimationFrame(id)},[videoRef,points,gaze]);
+  return <div className="panel relative aspect-video overflow-hidden rounded-xl bg-black"><video ref={videoRef} muted playsInline className="h-full w-full scale-x-[-1] object-cover opacity-80"/><canvas ref={canvas} className="pointer-events-none absolute inset-0 h-full w-full"/><div className="scan pointer-events-none absolute inset-x-0 h-12 bg-cyan/10"/><div className="absolute left-3 top-3 rounded bg-black/70 px-2 py-1 font-mono text-[10px] tracking-widest text-cyan">FACE MESH · 478 LANDMARKS</div></div>;
+}
